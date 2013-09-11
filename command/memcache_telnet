@@ -1,0 +1,90 @@
+ngyan，value为12345） 
+printf "set zhangyan 0 0 5\r\n12345\r\n" | nc 127.0.0.1 11211 
+　STORED 
+
+　　2、数据取回（假设key为zhangyan） 
+printf "get zhangyan\r\n" | nc 127.0.0.1 11211 
+　VALUE zhangyan 0 5 
+　12345 
+　END 
+
+　　3、数值增加1（假设key为zhangyan，并且value为正整数） 
+printf "incr zhangyan 1\r\n" | nc 127.0.0.1 11211 
+　12346 
+
+　　4、数值减少3（假设key为zhangyan，并且value为正整数） 
+printf "decr zhangyan 3\r\n" | nc 127.0.0.1 11211 
+　12343 
+
+　　5、数据删除（假设key为zhangyan） 
+printf "delete zhangyan\r\n" | nc 127.0.0.1 11211 
+　DELETED 
+
+　　6、查看Memcached状态 
+printf "stats\r\n" | nc 127.0.0.1 11211 
+　STAT pid 3025 
+　STAT uptime 4120500 
+　STAT time 1228021767 
+　STAT version 1.2.6 
+　STAT pointer_size 32 
+　STAT rusage_user 433.463103 
+　STAT rusage_system 1224.515845 
+　STAT curr_items 1132460 
+　STAT total_items 8980260 
+　STAT bytes 1895325386 
+　STAT curr_connections 252 
+　STAT total_connections 547850 
+　STAT connection_structures 1189 
+　STAT cmd_get 13619685 
+　STAT cmd_set 8980260 
+　STAT get_hits 6851607 
+　STAT get_misses 6768078 
+　STAT evictions 0 
+　STAT bytes_read 160396238246 
+　STAT bytes_written 260080686529 
+　STAT limit_maxbytes 2147483648 
+　STAT threads 1 
+　END 
+
+
+1. stats 
+
+统计 
+
+2.stats malloc 
+
+显示内存分配 
+
+3. stats reset 
+
+清空统计数据 
+
+4. stats cachedump slab_id limit 
+
+显示某个slab中的前limit个key列表: ITEM key [ value_length b; expire_time s] (1.2.2前是访问时间，不是过期时间) 
+
+说明：expire_time是unixtime时间戳。如果一个key是没有过期的，那这个时间就等于memcache启动的时间。可以通过stats命令中获得的time – uptime 算得。 
+
+5. stats slabs 
+
+显示slabs信息。从这个命令能获取每个slabs的chunksize长度，从而确定数据到底存哪个slab。 
+
+6. stats items 
+
+显示slab中的item数目 
+
+7. stats detail dump 
+
+打印详细操作信息，需要使用stats detail on|off 来启动|关闭 
+
+8. get |gets 键 
+
+两者的区别是gets多返回一个更新版本，即该key值被更新的版本号 
+
+返回： 
+
+VALUE key flag length (ver) 
+
+data 
+
+另外，flag是客户端给的，对memcached服务器来说无意义。举例PHP的memcache客户端有个压缩选项，即设的这个flag，压缩操作在客户端做的。

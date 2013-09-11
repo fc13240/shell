@@ -1,0 +1,35 @@
+ched的基本设置：
+1.启动Memcache的服务器端：
+# /usr/local/bin/memcached -d -m 10 -u root -l 192.168.0.200 -p 12000 -c 256 -P /tmp/memcached.pid
+
+-d选项是启动一个守护进程，
+-m是分配给Memcache使用的内存数量，单位是MB，我这里是10MB，
+-u是运行Memcache的用户，我这里是root，
+-l是监听的服务器IP地址，如果有多个地址的话，我这里指定了服务器的IP地址192.168.0.200，
+-p是设置Memcache监听的端口，我这里设置了12000，最好是1024以上的端口，
+-c选项是最大运行的并发连接数，默认是1024，我这里设置了256，按照你服务器的负载量来设定，
+-P是设置保存Memcache的pid文件，我这里是保存在 /tmp/memcached.pid，
+
+2.如果要结束Memcache进程，执行：
+
+# kill `cat /tmp/memcached.pid`
+
+也可以启动多个守护进程，不过端口不能重复。
+
+3.重启apache，service httpd restart
+
+
++++++++++++++++++++++++++++++++++++++++
+在防火墙中添加端口
+/sbin/iptables -I INPUT -p tcp --dport 80 -j ACCEPT #开启80端口 
+/sbin/iptables -I INPUT -p tcp --dport 22 -j ACCEPT #开启22端口 
+/etc/rc.d/init.d/iptables save #保存配置 
+/etc/rc.d/init.d/iptables restart #重启服务 
+查看已开放端口 
+/etc/init.d/iptables status 
+结果如下 
+Table: filter 
+Chain INPUT (policy ACCEPT) 
+num target prot opt source destination 
+2 ACCEPT tcp -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
+3 ACCEPT tcp -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:80 

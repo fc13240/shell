@@ -8,7 +8,6 @@ LOG_PATH=/tonny/log/
 if [ ! -d $TEMP_PATH ]; then 
 	mkdir -p $TEMP_PATH
 fi
-echo '======== restart ========' >> ${LOG_PATH}sh_$(date +%Y-%m-%d).log;
 
 function informAdmin(){
 	info=[$(date '+%Y-%m-%d %H:%M:%S')]" $1"
@@ -47,8 +46,19 @@ function run() {
     fi
     usedTime=$(($(date +%s) - $startTime))
     echo $showTime' takes '$usedTime's' >> $shellLog
-    sleep 10
-    #repeat run
-    run
+    return $usedTime
 }
-run
+DELAY=10
+totalSeconds=55
+usedSeconds=0
+
+echo '======== crontab start ========' >> ${LOG_PATH}sh_$(date +%Y-%m-%d).log;
+
+while [ $usedSeconds -le $totalSeconds ]
+do
+    run
+    usedSeconds=$(($?+$usedSeconds+$DELAY))
+    if [ $usedSeconds -le $totalSeconds ];then
+        sleep $DELAY
+    fi
+done
